@@ -1,0 +1,87 @@
+#header {
+    text-align: right;
+    color: red;
+}
+
+#search {
+    text-align: center;
+    position: relative;
+    top: 350px;
+}
+
+#search_as {
+    text-align: left;
+    position: relative;
+    top: 150px;
+}
+
+.input_as {
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 10px;
+    padding-right: 10px;
+    width: 600px;
+}
+
+.input_round {
+    border: 1px solid gainsboro;
+    border-radius: 20px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 20px;
+    padding-right: 20px;
+    width: 400px;
+}
+
+.input_round:hover,
+.input_round:focus {
+    outline: none;
+    box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+}
+
+#table_as {
+    text-align: left;
+}
+
+.query_as {
+    padding-right: 40px;
+}
+
+%submit {
+    margin-top: 20px;
+    padding-left: 12px;
+    padding-right: 12px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    border: 1px solid white;
+    border-radius: 2px;
+}
+
+#submit {
+    @extend %submit
+}
+
+#submit:hover {
+    border: 1px solid gainsboro;
+}
+
+#submit_as {
+    @extend %submit;
+    text-align: left;
+    position: relative;
+    left: 705px;
+    background-color: #8ab4f8;
+}
+
+#submit_as:hover {
+    background-color: #aecbfa;
+    border: 1px solid #8ab4f8;
+}
+
+#find_pages {
+    font-size: larger;
+}
+
+#body {
+    font-family: Arial, sans-serif;
+}
