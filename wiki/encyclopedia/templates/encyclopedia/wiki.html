@@ -7,5 +7,8 @@
 {% block body %}
 {% autoescape off %}
 {{ content }}
+<p></p>
+
+<p><a href="{% url 'edit_page' title %}">Edit</a> this page</p>
 {% endautoescape %}
 {% endblock %}

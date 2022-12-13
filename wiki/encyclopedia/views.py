@@ -1,14 +1,10 @@
-from django import forms
 from django.shortcuts import render
-from django.http import HttpResponse
 import markdown2
+from django.http import HttpResponseRedirect
+from django.urls import reverse
+import random
 
 from . import util
-
-
-class EditPageForm(forms.Form):
-    title = forms.CharField(label="Title", max_length=50, name="title", required=True)
-    content = forms.CharField(label="Content", widget=forms.Textarea, name="content")
 
 
 def index(request):
@@ -24,7 +20,11 @@ def render_page(request, title):
             {"title": title, "content": markdown2.markdown(content)},
         )
     else:
-        return render(request, "encyclopedia/error.html", {"title": title})
+        return render(
+            request,
+            "encyclopedia/error.html",
+            {"error_message": f"Page {title} not found!"},
+        )
 
 
 def search(request):
@@ -37,5 +37,39 @@ def search(request):
 
 
 def add_page(request):
+    if request.method == "POST":
+        if request.POST["title"] not in util.list_entries():
+            util.save_entry(request.POST["title"], request.POST["content"])
+            return HttpResponseRedirect(reverse("index"))
+        else:
+            return render(
+                request,
+                "encyclopedia/error.html",
+                {"error_message": f"Page {request.POST['title']} already exists!"},
+            )
 
-    return render(request, "encyclopedia/add_page.html", {"form": EditPageForm()})
+    return render(request, "encyclopedia/add_page.html")
+
+
+def edit_page(request, title):
+    if request.method == "POST":
+        if title in util.list_entries():
+            util.save_entry(title, request.POST["content"])
+            return HttpResponseRedirect(reverse("index"))
+        else:
+            return render(
+                request,
+                "encyclopedia/error.html",
+                {"error_message": f"Cannot edit - page {title} does not exists!"},
+            )
+
+    return render(
+        request,
+        "encyclopedia/edit_page.html",
+        {"title": title, "content": util.get_entry(title)},
+    )
+
+
+def random_page(request):
+    title = random.choice(util.list_entries())
+    return HttpResponseRedirect(reverse("render_page", args=[title]))
