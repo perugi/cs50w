@@ -1,0 +1,29 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+<h2>Active Listings</h2>
+<table>
+    {% for listing in listings %}
+    <tr>
+        <td rowspan="4">
+            <a href="{% url 'view_listing' listing.id %}">
+                <img src="{{ listing.image }}" alt="No photo provided">
+            </a>
+        </td>
+        <td><a href="{% url 'view_listing' listing.id %}">{{ listing.title }}</a></td>
+    </tr>
+    <tr>
+        <td>Price: EUR {{ listing.bid|floatformat:"2g" }}</td>
+    </tr>
+    <tr>
+        <td>{{ listing.description }}</td>
+    </tr>
+    <tr>
+        <td>Created {{ listing.created }}</td>
+    </tr>
+    </a>
+
+    {% endfor %}
+</table>
+
+{% endblock %}

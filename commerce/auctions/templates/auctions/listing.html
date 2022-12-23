@@ -1,0 +1,23 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+<h2>Listing: {{ listing.title }}</h2>
+{% if user.is_authenticated %}
+<button type="button" class="btn btn-primary position-relative">
+{% if watchlisted %}
+<span class="badge text-bg-primary">In Watchlist</span>
+{% else %}
+<span class="badge text-bg-secondary">Add to Watchlist</span>
+</button>
+{% endif %}
+{% endif %}
+<img src="{{ listing.image }}" alt="No photo provided">
+<p>{{ listing.description }}</p>
+<p>Price: EUR {{ listing.bid|floatformat:"2g" }}</p>
+<h3>Details</h3>
+<ul>
+    <li>Listed by: {{ listing.creator }}</li>
+    <li>Created: {{ listing.created }}</li>
+    <li>Category: {{ listing.get_category_display }}</li>
+</ul>
+{% endblock %}
