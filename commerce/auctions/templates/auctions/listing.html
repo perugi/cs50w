@@ -14,10 +14,31 @@
 <img src="{{ listing.image }}" alt="No photo provided">
 <p>{{ listing.description }}</p>
 <p>Price: EUR {{ listing.bid|floatformat:"2g" }}</p>
+
 <h3>Details</h3>
 <ul>
     <li>Listed by: {{ listing.creator }}</li>
     <li>Created: {{ listing.created }}</li>
     <li>Category: {{ listing.get_category_display }}</li>
 </ul>
+
+<h3>Comments</h3>
+{% if comments %}
+{% for comment in comments %}
+<p>{{ comment.author }}</p>
+<p>{{ comment.created }}</p>
+<p>{{ comment.text }}</p>
+<hr>
+{% endfor %}
+{% else %}
+<p>No comments submitted</p>
+{% endif %}
+
+{% if user.is_authenticated %}
+<form action="{% url 'comment' listing.id%}" method="post">
+    {% csrf_token %}
+    {{ comment_form }}
+    <input type="submit">
+</form>
+{% endif %}
 {% endblock %}

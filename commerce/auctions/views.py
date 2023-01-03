@@ -2,13 +2,12 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
 from django.forms import ModelForm
-from django.http import (HttpResponse, HttpResponseBadRequest,
-                         HttpResponseRedirect)
+from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
 from .constants import CATEGORY_CHOICES
-from .models import Listing, User
+from .models import Listing, User, Comment
 
 
 def index(request):
@@ -16,14 +15,30 @@ def index(request):
 
 
 def categories(request, category):
-    listings = [
-        listing for listing in Listing.objects.all() if listing.category == category
-    ]
-    print(category)
+    listings = Listing.objects.filter(category=category)
     return render(
         request,
         "auctions/category.html",
         {"listings": listings, "categories": CATEGORY_CHOICES, "active": category},
+    )
+
+
+@login_required
+def comment(request, listing_id):
+    try:
+        listing = Listing.objects.get(pk=listing_id)
+    except Listing.DoesNotExist:
+        return HttpResponseBadRequest("Bad Request: listing does not exist")
+
+    form = CommentForm(request.POST)
+    if form.is_valid():
+        new_comment = form.save(commit=False)
+        new_comment.author = request.user
+        new_comment.listing_id = listing_id
+        new_comment.save()
+
+    return HttpResponseRedirect(
+        reverse("view_listing", kwargs={"listing_id": listing_id})
     )
 
 
@@ -42,7 +57,7 @@ def create_listing(request):
             new_listing = form.save(commit=False)
             new_listing.creator = request.user
             new_listing.save()
-            return HttpResponseRedirect(reverse("index"))
+        return HttpResponseRedirect(reverse("index"))
     else:
         return render(request, "auctions/create.html", {"form": ListingForm()})
 
@@ -120,19 +135,35 @@ def set_watchlist(request, listing_id):
     )
 
 
+class CommentForm(ModelForm):
+    class Meta:
+        model = Comment
+        fields = ["text"]
+        labels = {"text": "New comment"}
+
+
 def view_listing(request, listing_id):
     try:
         listing = Listing.objects.get(pk=listing_id)
     except Listing.DoesNotExist:
         return HttpResponseBadRequest("Bad Request: listing does not exist")
+
     if request.user.id in [user.id for user in listing.watchlist.all()]:
         watchlisted = True
     else:
         watchlisted = False
+
+    comments = Comment.objects.filter(listing=listing)
+
     return render(
         request,
         "auctions/listing.html",
-        {"listing": listing, "watchlisted": watchlisted},
+        {
+            "listing": listing,
+            "watchlisted": watchlisted,
+            "comments": comments,
+            "comment_form": CommentForm,
+        },
     )
 
 
