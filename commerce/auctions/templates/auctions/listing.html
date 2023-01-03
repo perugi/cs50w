@@ -3,13 +3,13 @@
 {% block body %}
 <h2>Listing: {{ listing.title }}</h2>
 {% if user.is_authenticated %}
-<button type="button" class="btn btn-primary position-relative">
-{% if watchlisted %}
-<span class="badge text-bg-primary">In Watchlist</span>
-{% else %}
-<span class="badge text-bg-secondary">Add to Watchlist</span>
-</button>
-{% endif %}
+<a href="{% url 'set_watchlist' listing.id %}">
+    {% if watchlisted %}
+    <button type="button" class="btn btn-primary">In Watchlist </button>
+    {% else %}
+    <button type="button" class="btn btn-secondary">Add to Watchlist</button>
+    {% endif %}
+</a>
 {% endif %}
 <img src="{{ listing.image }}" alt="No photo provided">
 <p>{{ listing.description }}</p>

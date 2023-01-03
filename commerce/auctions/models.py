@@ -1,6 +1,8 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
+from .constants import CATEGORY_CHOICES
+
 
 class User(AbstractUser):
     pass
@@ -13,14 +15,8 @@ class Listing(models.Model):
     bid = models.FloatField(default=0)
     description = models.TextField(blank=True)
     image = models.URLField(blank=True)
-    CATEGORY_CHOICES = [
-        ("HO", "Home"),
-        ("OF", "Office"),
-        ("SP", "Outdoor & Sports"),
-        ("MA", "Magic"),
-    ]
     category = models.CharField(max_length=2, choices=CATEGORY_CHOICES, blank=True)
-    watchlist = models.ManyToManyField(User)
+    watchlist = models.ManyToManyField(User, blank=True)
 
     def __str__(self):
         return f"{self.id} : {self.title} [{self.creator}]"
