@@ -16,7 +16,7 @@
         <td><a href="{% url 'view_listing' listing.id %}">{{ listing.title }}</a></td>
     </tr>
     <tr>
-        <td>Price: EUR {{ listing.bid|floatformat:"2g" }}</td>
+        <td>EUR {{ listing.bid|floatformat:"2g" }}</td>
     </tr>
     <tr>
         <td>{{ listing.description }}</td>
@@ -24,8 +24,6 @@
     <tr>
         <td>Created {{ listing.created }}</td>
     </tr>
-    </a>
-
     {% endfor %}
 </table>
 

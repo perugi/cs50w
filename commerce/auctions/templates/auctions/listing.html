@@ -2,10 +2,15 @@
 
 {% block body %}
 <h2>Listing: {{ listing.title }}</h2>
-{% if user.is_authenticated %}
+{% if listing.active and user.is_authenticated %}
+{% if user == listing.creator %}
+<a href="{% url 'close_listing' listing.id %}">
+    <button type="button" class="btn btn-primary">Close Listing</button>
+</a>
+{% endif %}
 <a href="{% url 'set_watchlist' listing.id %}">
     {% if watchlisted %}
-    <button type="button" class="btn btn-primary">In Watchlist </button>
+    <button type="button" class="btn btn-primary">In Watchlist</button>
     {% else %}
     <button type="button" class="btn btn-secondary">Add to Watchlist</button>
     {% endif %}
@@ -13,10 +18,58 @@
 {% endif %}
 <img src="{{ listing.image }}" alt="No photo provided">
 <p>{{ listing.description }}</p>
-<p>Price: EUR {{ listing.bid|floatformat:"2g" }}</p>
+<p>EUR {{ listing.bid|floatformat:"2g" }}</p>
+<p>
+    {% if listing.active %}
+    {% if no_bids == 1 %}
+    {{ no_bids }} bid so far.
+    {% elif no_bids > 1 %}
+    {{ no_bids }} bids so far.
+    {% else %}
+    No bids yet.
+    {% endif %}
+    {% if user.is_authenticated %}
+    {% if user == listing.creator %}
+    You are the listing creator.
+    {% elif highest %}
+    You are the highest bidder.
+    {% endif %}
+    {% else %}
+    Sign in to make a bid.
+    {% endif %}
+    {% else %}
+    Bidding closed.
+    {% if no_bids %}
+    {% if user == listing.creator %}
+    You have successfully sold the item!
+    {% elif highest %}
+    You are the winner of the bid!
+    {% else %}
+    Item was sold to another user.
+    {% endif %}
+    {% else %}
+    Item was not sold.
+    {% endif %}
+    {% endif %}
+</p>
+
+{% if listing.active and user.is_authenticated and not user == listing.creator %}
+<form action="{% url 'bid' listing.id%}" method="post">
+    {% csrf_token %}
+    {{ bid_form }}
+    <input type="submit" value="Bid">
+</form>
+{% endif %}
 
 <h3>Details</h3>
 <ul>
+    <li>Status:
+        {% if listing.active %}
+        Active
+        {% else %}
+        Closed
+        {% endif %}
+    </li>
     <li>Listed by: {{ listing.creator }}</li>
     <li>Created: {{ listing.created }}</li>
     <li>Category: {{ listing.get_category_display }}</li>
@@ -31,14 +84,14 @@
 <hr>
 {% endfor %}
 {% else %}
-<p>No comments submitted</p>
+<p>No comments submitted.</p>
 {% endif %}
 
-{% if user.is_authenticated %}
+{% if listing.active and user.is_authenticated %}
 <form action="{% url 'comment' listing.id%}" method="post">
     {% csrf_token %}
     {{ comment_form }}
-    <input type="submit">
+    <input type="submit" value="Comment">
 </form>
 {% endif %}
 {% endblock %}
