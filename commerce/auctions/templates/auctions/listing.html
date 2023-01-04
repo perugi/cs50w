@@ -3,22 +3,18 @@
 {% block body %}
 <h2>Listing: {{ listing.title }}</h2>
 {% if listing.active and user.is_authenticated %}
-{% if user == listing.creator %}
-<a href="{% url 'close_listing' listing.id %}">
-    <button type="button" class="btn btn-primary">Close Listing</button>
-</a>
-{% endif %}
 <a href="{% url 'set_watchlist' listing.id %}">
     {% if watchlisted %}
-    <button type="button" class="btn btn-primary">In Watchlist</button>
+    <button type="button" class="btn btn-primary px-1 py-0">In Watchlist</button>
     {% else %}
-    <button type="button" class="btn btn-secondary">Add to Watchlist</button>
+    <button type="button" class="btn btn-secondary px-1 py-0">Add to Watchlist</button>
     {% endif %}
 </a>
 {% endif %}
-<img src="{{ listing.image }}" alt="No photo provided">
-<p>{{ listing.description }}</p>
-<p>EUR {{ listing.bid|floatformat:"2g" }}</p>
+<p></p>
+<img class="listing_image" height="300px" src="{{ listing.image }}" alt="No photo provided">
+<p id="test">{{ listing.description }}</p>
+<p><b>EUR {{ listing.bid|floatformat:"2g" }}</b></p>
 <p>
     {% if listing.active %}
     {% if no_bids == 1 %}
@@ -53,15 +49,21 @@
     {% endif %}
 </p>
 
-{% if listing.active and user.is_authenticated and not user == listing.creator %}
+{% if listing.active and user.is_authenticated %}
+{% if user != listing.creator %}
 <form action="{% url 'bid' listing.id%}" method="post">
     {% csrf_token %}
     {{ bid_form }}
-    <input type="submit" value="Bid">
+    <input type="submit" class="btn btn-primary mt-2" value="Place Bid">
 </form>
+{% else %}
+<a href="{% url 'close_listing' listing.id %}">
+    <button type="button" class="btn btn-primary p-1">Close Listing</button>
+</a>
+{% endif %}
 {% endif %}
 
-<h3>Details</h3>
+<h3 id="details">Details</h3>
 <ul>
     <li>Status:
         {% if listing.active %}
@@ -91,7 +93,7 @@
 <form action="{% url 'comment' listing.id%}" method="post">
     {% csrf_token %}
     {{ comment_form }}
-    <input type="submit" value="Comment">
+    <input type="submit" class="btn btn-primary mt-2" value="New Comment">
 </form>
 {% endif %}
 {% endblock %}

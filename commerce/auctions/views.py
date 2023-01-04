@@ -1,7 +1,7 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
-from django.forms import ModelForm
+from django.forms import ModelForm, TextInput, NumberInput, Textarea, Select
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
@@ -20,6 +20,9 @@ class BidForm(ModelForm):
         model = Bid
         fields = ["bid"]
         labels = {"bid": ""}
+        widgets = {
+            "bid": TextInput(attrs={"class": "form-control", "placeholder": "Bid"})
+        }
 
 
 @login_required
@@ -76,6 +79,9 @@ class CommentForm(ModelForm):
         model = Comment
         fields = ["text"]
         labels = {"text": ""}
+        widgets = {
+            "text": TextInput(attrs={"class": "form-control", "placeholder": "Comment"})
+        }
 
 
 @login_required
@@ -126,7 +132,14 @@ class ListingForm(ModelForm):
     class Meta:
         model = Listing
         fields = ["title", "bid", "description", "image", "category"]
-        labels = {"bid": "Starting bid"}
+        labels = {"bid": "Starting Bid", "image": "Image URL"}
+        widgets = {
+            "title": TextInput(attrs={"class": "form-control mb-2"}),
+            "bid": NumberInput(attrs={"class": "form-control mb-2"}),
+            "description": Textarea(attrs={"class": "form-control mb-2"}),
+            "image": TextInput(attrs={"class": "form-control mb-2"}),
+            "category": Select(attrs={"class": "form-control mb-2"}),
+        }
 
 
 @login_required

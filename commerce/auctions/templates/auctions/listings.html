@@ -5,26 +5,32 @@
 {% endblock %}
 {% block selector %}
 {% endblock %}
+{% if listings %}
+{% for listing in listings %}
 <table>
-    {% for listing in listings %}
     <tr>
-        <td rowspan="4">
+        <td class="listing_image" rowspan="4">
             <a href="{% url 'view_listing' listing.id %}">
-                <img src="{{ listing.image }}" alt="No photo provided">
+                <img class="listing_image" src="{{ listing.image }}" alt="No photo provided">
             </a>
         </td>
         <td><a href="{% url 'view_listing' listing.id %}">{{ listing.title }}</a></td>
     </tr>
     <tr>
-        <td>EUR {{ listing.bid|floatformat:"2g" }}</td>
+        <td><b>Price: </b>EUR {{ listing.bid|floatformat:"2g" }}</td>
     </tr>
     <tr>
         <td>{{ listing.description }}</td>
     </tr>
     <tr>
-        <td>Created {{ listing.created }}</td>
+        <td class="text-muted listing_date">Created {{ listing.created }}</td>
     </tr>
-    {% endfor %}
 </table>
+<hr>
+{% endfor %}
+{% else %}
+<p></p>
+<p>No listings to display.</p>
+{% endif %}
 
 {% endblock %}

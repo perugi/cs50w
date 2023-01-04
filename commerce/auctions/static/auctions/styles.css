@@ -1,3 +1,19 @@
 body {
     padding: 10px;
 }
+
+.listing_image {
+    width: 300px
+}
+
+.listing_date {
+    font-size: 14px
+}
+
+#details {
+    padding-top: 15px;
+}
+
+#watchlist {
+    break-after: always;
+}
