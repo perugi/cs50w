@@ -1,0 +1,18 @@
+textarea {
+    min-height: 400px;
+}
+
+.email-display {
+    border-style: solid;
+    border-width: 2px;
+    margin-bottom: 5px;
+    padding: 5px;
+}
+
+.timestamp {
+    color: gray;
+}
+
+.read {
+    background-color: gainsboro;
+}
