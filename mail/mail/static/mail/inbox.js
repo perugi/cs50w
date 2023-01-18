@@ -14,6 +14,7 @@ function compose_email() {
 
   // Show compose view and hide other views
   document.querySelector('#emails-view').style.display = 'none';
+  document.querySelector('#read-view').style.display = 'none';
   document.querySelector('#compose-view').style.display = 'block';
 
   // Clear out composition fields
@@ -38,10 +39,10 @@ function compose_email() {
       .then(response => response.json())
       .then(result => {
         console.log(result)
+        load_mailbox('sent');
       })
 
-    load_mailbox('sent');
-
+    return false;
   }
 }
 
@@ -50,12 +51,15 @@ function load_mailbox(mailbox) {
   // Show the mailbox and hide other views
   document.querySelector('#emails-view').style.display = 'block';
   document.querySelector('#compose-view').style.display = 'none';
+  document.querySelector('#read-view').style.display = 'none';
 
   // Show the mailbox name
-  document.querySelector('#mailbox-name').innerHTML = `<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3>`;
+  document.querySelector('#emails-name').innerHTML = `<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3>`;
 
-  // Clear any existing that are displayed
+  // Clear any existing emails that are displayed
   document.querySelector('#emails-table').innerHTML = "";
+
+  // Fetch the mail data and generate the table
   fetch(`/emails/${mailbox}`)
     .then(response => response.json())
     .then(emails => {
@@ -65,7 +69,10 @@ function load_mailbox(mailbox) {
         row.className = "row email-display";
         if (email.read === true) {
           row.className += " read";
-        }
+        };
+        row.addEventListener('click', () => {
+          read_mail(email);
+        });
 
         const sender = document.createElement('div');
         sender.innerHTML = email.sender;
@@ -82,4 +89,37 @@ function load_mailbox(mailbox) {
 
       });
     });
+}
+
+function read_mail(email) {
+  // Mark the mail as read
+  fetch(`emails/${email.id}`, {
+    method: 'PUT',
+    body: JSON.stringify({
+      read: true
+    })
+  });
+
+  // Show the mail display and hide other views
+  document.querySelector('#read-view').style.display = 'block';
+  document.querySelector('#emails-view').style.display = 'none';
+  document.querySelector('#compose-view').style.display = 'none';
+
+  // Clear any existing email info that is displayed
+  document.querySelector('#read-info').innerHTML = "";
+
+  // Populate the mail info
+  const sender = document.createElement('div');
+  sender.innerHTML = `<b>From:</b> ${email.sender}`;
+  const recipients = document.createElement('div');
+  recipients.innerHTML = `<b>To:</b> ${email.recipients}`;
+  const subject = document.createElement('div');
+  subject.innerHTML = `<b>Subject:</b> ${email.subject}`;
+  const timestamp = document.createElement('div');
+  timestamp.innerHTML = `<b>Timestamp:</b> ${email.timestamp}`;
+
+  document.querySelector('#read-info').append(sender, recipients, subject, timestamp);
+
+  // Populate the mail body
+  document.querySelector('#read-body').innerHTML = email.body
 }
