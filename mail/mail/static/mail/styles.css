@@ -16,3 +16,11 @@ textarea {
 .read {
     background-color: gainsboro;
 }
+
+#reply-button {
+    margin-right: 5px;
+}
+
+#read-body {
+    white-space: pre-wrap;
+}
