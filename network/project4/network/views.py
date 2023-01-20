@@ -30,6 +30,31 @@ class PostForm(ModelForm):
         widgets = {"content": Textarea(attrs={"class": "form-control"})}
 
 
+@login_required
+def follow(request, profile_id):
+    try:
+        profile = User.objects.get(pk=profile_id)
+    except User.DoesNotExist:
+        return HttpResponseBadRequest("Bad Request: user does not exist")
+
+    if request.user in profile.followers.all():
+        profile.followers.remove(request.user.id)
+    else:
+        profile.followers.add(request.user.id)
+
+    return HttpResponseRedirect(
+        reverse("view_profile", kwargs={"profile_id": profile_id})
+    )
+
+
+@login_required
+def following(request):
+    posts = Post.objects.filter().order_by("-timestamp")
+    return render(
+        request, "network/following.html", {"posts": posts, "new_post": PostForm()}
+    )
+
+
 def index(request):
     posts = Post.objects.all().order_by("-timestamp")
     return render(

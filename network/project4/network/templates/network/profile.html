@@ -1,4 +1,5 @@
 {% extends "network/layout.html" %}
+{% load static %}
 
 {% block body %}
 <h2>{{ profile.username }}</h2>
@@ -6,13 +7,15 @@
 <div>Followers: {{ no_followers }}</div>
 
 {% if following != None %}
-<button type="Button" class="btn btn-primary">
-    {% if following == True %}
-    Follow
-    {% else %}
-    Unfollow
-    {% endif %}
-</button>
+<a href="{% url 'follow' profile.id %}">
+    <button id="follow" type="Button" class="btn btn-primary">
+        {% if following == True %}
+        Unfollow
+        {% else %}
+        Follow
+        {% endif %}
+    </button>
+</a>
 {% endif %}
 
 <hr>
