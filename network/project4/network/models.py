@@ -12,5 +12,8 @@ class Post(models.Model):
     content = models.TextField(max_length=280)
     timestamp = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        ordering = ["-timestamp"]
+
     def __str__(self):
         return f"{self.creator}: {self.content[0:8]}... [{self.timestamp}]"

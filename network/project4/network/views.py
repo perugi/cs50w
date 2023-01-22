@@ -49,14 +49,17 @@ def follow(request, profile_id):
 
 @login_required
 def following(request):
-    posts = Post.objects.filter().order_by("-timestamp")
+    follows = User.objects.get(pk=request.user.id)
+    print(follows.following)
+    # posts = Post.objects.filter(creator__in = request.user)
+    posts = []
     return render(
         request, "network/following.html", {"posts": posts, "new_post": PostForm()}
     )
 
 
 def index(request):
-    posts = Post.objects.all().order_by("-timestamp")
+    posts = Post.objects.all()
     return render(
         request, "network/index.html", {"posts": posts, "new_post": PostForm()}
     )
