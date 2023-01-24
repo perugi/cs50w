@@ -5,6 +5,7 @@ from django.http import HttpResponse, HttpResponseRedirect, HttpResponseBadReque
 from django.shortcuts import render
 from django.urls import reverse
 from django.forms import ModelForm, Textarea
+from django.core.paginator import Paginator
 
 from .models import User, Post
 
@@ -20,6 +21,8 @@ from .models import User, Post
 #         return HttpResponseRedirect(reverse("index"))
 #     else:
 #         return render(request, "auctions/create.html", {"form": ListingForm()})
+
+POST_PER_PAGE = 10
 
 
 class PostForm(ModelForm):
@@ -57,9 +60,30 @@ def following(request):
 
 
 def index(request):
+    return HttpResponseRedirect(reverse("posts", kwargs={"page": 1}))
+
+
+def posts(request, page):
     posts = Post.objects.all()
+    posts_paginated = Paginator(posts, POST_PER_PAGE)
+    posts_page = posts_paginated.page(page)
+    if posts_page.has_previous():
+        previous_page = page - 1
+    else:
+        previous_page = None
+    if posts_page.has_next():
+        next_page = page + 1
+    else:
+        next_page = None
+    pn = (previous_page, next_page)
     return render(
-        request, "network/index.html", {"posts": posts, "new_post": PostForm()}
+        request,
+        "network/index.html",
+        {
+            "posts": posts_page,
+            "new_post": PostForm(),
+            "pn": pn,
+        },
     )
 
 
