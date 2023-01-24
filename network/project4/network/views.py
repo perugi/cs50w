@@ -5,9 +5,10 @@ from django.http import HttpResponse, HttpResponseRedirect, HttpResponseBadReque
 from django.shortcuts import render
 from django.urls import reverse
 from django.forms import ModelForm, Textarea
-from django.core.paginator import Paginator
 
 from .models import User, Post
+
+from .helpers import prepare_post_page
 
 
 # @login_required
@@ -51,11 +52,14 @@ def follow(request, profile_id):
 
 
 @login_required
-def following(request):
+def following(request, page):
     following = User.objects.get(pk=request.user.id).following.all()
     posts = Post.objects.filter(creator__in=following)
+    posts_page, pn = prepare_post_page(posts, page, POST_PER_PAGE)
     return render(
-        request, "network/following.html", {"posts": posts, "new_post": PostForm()}
+        request,
+        "network/following.html",
+        {"posts": posts_page, "new_post": PostForm(), "pn": pn},
     )
 
 
@@ -65,17 +69,7 @@ def index(request):
 
 def posts(request, page):
     posts = Post.objects.all()
-    posts_paginated = Paginator(posts, POST_PER_PAGE)
-    posts_page = posts_paginated.page(page)
-    if posts_page.has_previous():
-        previous_page = page - 1
-    else:
-        previous_page = None
-    if posts_page.has_next():
-        next_page = page + 1
-    else:
-        next_page = None
-    pn = (previous_page, next_page)
+    posts_page, pn = prepare_post_page(posts, page, POST_PER_PAGE)
     return render(
         request,
         "network/index.html",
