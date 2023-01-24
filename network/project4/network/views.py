@@ -49,10 +49,8 @@ def follow(request, profile_id):
 
 @login_required
 def following(request):
-    follows = User.objects.get(pk=request.user.id)
-    print(follows.following)
-    # posts = Post.objects.filter(creator__in = request.user)
-    posts = []
+    following = User.objects.get(pk=request.user.id).following.all()
+    posts = Post.objects.filter(creator__in=following)
     return render(
         request, "network/following.html", {"posts": posts, "new_post": PostForm()}
     )
