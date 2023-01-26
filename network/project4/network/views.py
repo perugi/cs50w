@@ -1,10 +1,18 @@
+import json
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
-from django.http import HttpResponse, HttpResponseRedirect, HttpResponseBadRequest
+from django.http import (
+    HttpResponse,
+    HttpResponseRedirect,
+    HttpResponseBadRequest,
+    JsonResponse,
+)
 from django.shortcuts import render
 from django.urls import reverse
 from django.forms import ModelForm, Textarea
+from django.views.decorators.csrf import csrf_exempt
+from django.core.exceptions import ObjectDoesNotExist
 
 from .models import User, Post
 
@@ -32,6 +40,32 @@ class PostForm(ModelForm):
         fields = ["content"]
         labels = {"content": ""}
         widgets = {"content": Textarea(attrs={"class": "form-control"})}
+
+
+@csrf_exempt
+@login_required
+def edit_post(request):
+
+    # Editing a post must be via POST
+    if request.method != "POST":
+        return JsonResponse({"error": "POST request required."}, status=400)
+
+    data = json.loads(request.body)
+    id, new_content = (data["id"], data["new_content"])
+
+    # Get the post from the db, return error if the post does not exist.
+    try:
+        post = Post.objects.get(pk=id)
+    except ObjectDoesNotExist:
+        return JsonResponse({"message": "Post does not exist"}, status=404)
+
+    # Check that the logged in user is editing his own posts.
+    if request.user.id != post.creator.id:
+        return JsonResponse({"message": "Cannot edit post, logged in user not the post creator."}, status=401)
+
+    post.content = new_content
+    post.save()
+    return JsonResponse({"message": "Post edited successfully"}, status=200)
 
 
 @login_required
@@ -65,20 +99,6 @@ def following(request, page):
 
 def index(request):
     return HttpResponseRedirect(reverse("posts", kwargs={"page": 1}))
-
-
-def posts(request, page):
-    posts = Post.objects.all()
-    posts_page, pn = prepare_post_page(posts, page, POST_PER_PAGE)
-    return render(
-        request,
-        "network/index.html",
-        {
-            "posts": posts_page,
-            "new_post": PostForm(),
-            "pn": pn,
-        },
-    )
 
 
 def login_view(request):
@@ -117,6 +137,21 @@ def new_post(request):
             new_post.creator = request.user
             new_post.save()
     return HttpResponseRedirect(reverse("index"))
+
+
+def posts(request, page):
+    posts = Post.objects.all()
+    posts_page, pn = prepare_post_page(posts, page, POST_PER_PAGE)
+    print(posts_page[1].id)
+    return render(
+        request,
+        "network/index.html",
+        {
+            "posts": posts_page,
+            "new_post": PostForm(),
+            "pn": pn,
+        },
+    )
 
 
 def register(request):

@@ -11,6 +11,7 @@ class Post(models.Model):
     creator = models.ForeignKey("User", on_delete=models.CASCADE, related_name="posts")
     content = models.TextField(max_length=280)
     timestamp = models.DateTimeField(auto_now_add=True)
+    like_count = models.IntegerField(default=0)
 
     class Meta:
         ordering = ["-timestamp"]

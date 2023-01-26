@@ -1,6 +1,10 @@
 {% extends "network/layout.html" %}
 {% load static %}
 
+{% block script %}
+<script src="{% static 'network/posts.js' %}"></script>
+{% endblock %}
+
 {% block body %}
 <h2>{{ profile.username }}</h2>
 <div>Following: {{ no_following }}</div>
@@ -20,8 +24,9 @@
 
 <hr>
 {% for post in posts %}
-<div class="post">
+<div id="{{ post.id }}" class="post">
     <h3>{{ post.creator }}</h3>
+    <div class="post-edit">Edit</div>
     <div class="post-content">{{ post.content }}</div>
     <div class="post-timestamp">{{ post.timestamp }}</div>
 </div>
