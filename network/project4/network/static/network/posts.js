@@ -6,8 +6,12 @@ document.addEventListener('DOMContentLoaded', function () {
             edit_button.addEventListener('click', () => edit_post_field(post))
         }
 
-        const like_icon = post.querySelector(".like-icon");
-        like_icon.addEventListener('click', () => like_post(post))
+        const auth = document.querySelector("#is-authenticated");
+        console.log(auth);
+        if (auth !== null) {
+            const like_icon = post.querySelector(".like-icon");
+            like_icon.addEventListener('click', () => like_post(post));
+        }
     });
 });
 
@@ -43,9 +47,9 @@ function edit_post(post) {
 
     post.replaceChild(content, edit_form);
 
-    // Make a POST call to edit the post in the database.
+    // Make a PUT call to edit the post in the database.
     fetch('/edit_post', {
-        method: 'POST',
+        method: 'PUT',
         body: JSON.stringify({
             id: post.id,
             new_content: new_content
@@ -61,6 +65,7 @@ function like_post(post) {
     const post_likes = post.querySelector(".post-likes");
     const like_count = post.querySelector(".like-count");
     const user_liked = post.querySelector(".user-liked");
+    let new_status = false;
 
     // Make the changes on the front-end.
     // User does not like the post yet, add to the like count and bold it, create the user-liked hidden element.
@@ -73,14 +78,29 @@ function like_post(post) {
         user_liked_new.className = "user-liked";
         user_liked_new.setAttribute("type", "hidden");
         post_likes.append(user_liked_new);
+
+        new_status = true;
     }
 
     else {
         like_count.innerHTML = Number(like_count.innerHTML) - 1;
         like_count.classList.remove("liked");
         user_liked.remove();
+
+        new_status = false;
     }
 
-    // Make a call to edit the likes in the database.
-    // TODO
+    // Make a PUT call to like/unlike the post in the database. We use the same link for liking/unliking,
+    // as it toggles the status of the like for the logged in user. The new_status is sent for verification only.
+    fetch('/like_post', {
+        method: 'PUT',
+        body: JSON.stringify({
+            id: post.id,
+            new_status: new_status
+        })
+    })
+        .then(response => response.json())
+        .then(result => {
+            console.log(result)
+        })
 }   
