@@ -32,6 +32,17 @@
     {% endif %}
     <div class="post-content">{{ post.content }}</div>
     <div class="post-timestamp">{{ post.timestamp }}</div>
+    <div class="post-likes">
+        <img class="like-icon" src="{% static 'network/heart.png' %}">
+        &nbsp;
+        {% if user in post.likes.all %}
+        <div class="like-count liked">{{ post.no_likes }}</div>
+        <div class="user-liked" hidden></div>
+        {% else %}
+        <div class="like-count">{{ post.no_likes }}</div>
+        {% endif %}
+    </div>
+
 </div>
 {% endfor %}
 
