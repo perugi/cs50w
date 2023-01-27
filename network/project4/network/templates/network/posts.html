@@ -1,5 +1,6 @@
 {% extends "network/layout.html" %}
 {% load static %}
+{% load tz %}
 
 {% block script %}
 <script src="{% static 'network/posts.js' %}"></script>
@@ -11,12 +12,12 @@
 {% endblock %}
 
 {% if user.is_authenticated %}
-<div class="new_post">
+<div class="new-post">
     <h3>New Post</h3>
     <form action="{% url 'new_post' %}" method="post">
         {% csrf_token %}
         {{ new_post }}
-        <input class="btn btn-primary" type="submit" value="Post">
+        <input id="post-button" class="btn btn-primary mt-2" type="submit" value="Post">
     </form>
 </div>
 <div id="is-authenticated" hidden></div>
@@ -24,23 +25,27 @@
 
 {% for post in posts %}
 <div id="{{ post.id }}" class="post">
-    <a class="nav-link" href="{% url 'view_profile' post.creator.id %}">
+    <a class="nav-link" href="{% url 'view_profile' profile_id=post.creator.id page=1 %}">
         <h3 class="post-creator">{{ post.creator }}</h3>
     </a>
 
     {% if user == post.creator %}
-    <div class="post-edit">Edit</div>
+    <a href="#" class="post-edit">Edit</a>
     {% endif %}
     <div class="post-content">{{ post.content }}</div>
-    <div class="post-timestamp">{{ post.timestamp }}</div>
+    <div class="post-timestamp">
+        {{ post.timestamp|localtime }}
+        {% if post.edited %}
+        (edited)
+        {% endif %}
+    </div>
     <div class="post-likes">
         <img class="like-icon" src="{% static 'network/heart.png' %}">
-        &nbsp;
         {% if user in post.likes.all %}
         <div class="like-count liked">{{ post.no_likes }}</div>
         <div class="user-liked" hidden></div>
         {% else %}
-        <div class="like-count">{{ post.no_likes }}</div>
+        <div class="like-count not-liked">{{ post.no_likes }}</div>
         {% endif %}
     </div>
 

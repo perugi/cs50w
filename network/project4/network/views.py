@@ -13,6 +13,7 @@ from django.urls import reverse
 from django.forms import ModelForm, Textarea
 from django.views.decorators.csrf import csrf_exempt
 from django.core.exceptions import ObjectDoesNotExist
+from datetime import datetime
 
 from .models import User, Post
 
@@ -39,7 +40,7 @@ class PostForm(ModelForm):
         model = Post
         fields = ["content"]
         labels = {"content": ""}
-        widgets = {"content": Textarea(attrs={"class": "form-control"})}
+        widgets = {"content": Textarea(attrs={"class": "form-control", "rows": "3"})}
 
 
 @csrf_exempt
@@ -67,6 +68,8 @@ def edit_post(request):
         )
 
     post.content = new_content
+    post.edited = True
+    post.timestamp = datetime.now()
     post.save()
     return JsonResponse({"message": "Post edited successfully"}, status=200)
 
@@ -190,7 +193,6 @@ def new_post(request):
 def posts(request, page):
     posts = Post.objects.all()
     posts_page, pn = prepare_post_page(posts, page, POST_PER_PAGE)
-    print(posts_page[1].id)
     return render(
         request,
         "network/index.html",
@@ -229,7 +231,7 @@ def register(request):
         return render(request, "network/register.html")
 
 
-def view_profile(request, profile_id):
+def view_profile(request, profile_id, page):
     try:
         profile = User.objects.get(pk=profile_id)
     except User.DoesNotExist:
@@ -247,8 +249,8 @@ def view_profile(request, profile_id):
     else:
         following = False
 
-    print(f"following: {following}")
     posts = profile.posts.all().order_by("-timestamp")
+    posts_page, pn = prepare_post_page(posts, page, POST_PER_PAGE)
 
     return render(
         request,
@@ -258,6 +260,7 @@ def view_profile(request, profile_id):
             "no_followers": no_followers,
             "no_following": no_following,
             "following": following,
-            "posts": posts,
+            "posts": posts_page,
+            "pn": pn,
         },
     )

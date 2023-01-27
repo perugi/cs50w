@@ -5,4 +5,44 @@
 
 .liked {
     font-weight: bold;
+    color: black;
+}
+
+.not-liked {
+    color: gray;
+}
+
+.new-post {
+    border-style: solid;
+    border-width: 1px;
+    border-radius: 5px;
+    border-color: lightgray;
+    padding: 20px;
+}
+
+.body {
+    padding: 10px;
+}
+
+.post {
+    border-style: solid;
+    border-width: 1px;
+    border-radius: 5px;
+    border-color: lightgray;
+    padding: 10px;
+
+    margin-top: 5px;
+
+}
+
+#navigation {
+    margin-top: 10px;
+}
+
+.post-timestamp {
+    color: gray;
+}
+
+.like-count {
+    display: inline-block;
 }

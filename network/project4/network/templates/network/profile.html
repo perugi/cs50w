@@ -1,11 +1,17 @@
 {% extends "network/layout.html" %}
 {% load static %}
+{% load tz %}
 
 {% block script %}
 <script src="{% static 'network/posts.js' %}"></script>
 {% endblock %}
 
 {% block body %}
+
+{% if user.is_authenticated %}
+<div id="is-authenticated" hidden></div>
+{% endif %}
+
 <h2>{{ profile.username }}</h2>
 <div>Following: {{ no_following }}</div>
 <div>Followers: {{ no_followers }}</div>
@@ -26,10 +32,43 @@
 {% for post in posts %}
 <div id="{{ post.id }}" class="post">
     <h3>{{ post.creator }}</h3>
-    <div class="post-edit">Edit</div>
+    {% if user == post.creator %}
+    <a href="#" class="post-edit">Edit</a>
+    {% endif %}
     <div class="post-content">{{ post.content }}</div>
-    <div class="post-timestamp">{{ post.timestamp }}</div>
+    <div class="post-timestamp">
+        {% localtime on %}
+        {{ post.timestamp }}
+        {% endlocaltime %}
+        {% if post.edited %}
+        (edited)
+        {% endif %}
+    </div>
+    <div class="post-likes">
+        <img class="like-icon" src="{% static 'network/heart.png' %}">
+        {% if user in post.likes.all %}
+        <div class="like-count liked">{{ post.no_likes }}</div>
+        <div class="user-liked" hidden></div>
+        {% else %}
+        <div class="like-count not-liked">{{ post.no_likes }}</div>
+        {% endif %}
+    </div>
 </div>
 {% endfor %}
+
+<nav id="navigation" aria-label="Page navigation">
+    <ul class="pagination">
+        {% if pn.0 %}
+        <li class="page-item"><a class="page-link"
+                href="{% url 'view_profile' profile_id=profile.id page=pn.0 %}">Previous</a></li>
+        {% endif %}
+        {% if pn.1 %}
+        <li class="page-item"><a class="page-link"
+                href="{% url 'view_profile' profile_id=profile.id page=pn.1 %}">Next</a>
+        </li>
+        {% endif %}
+
+    </ul>
+</nav>
 
 {% endblock %}

@@ -13,6 +13,7 @@ class Post(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
     likes = models.ManyToManyField("User", related_name="liked_posts")
     no_likes = models.IntegerField(default=0)
+    edited = models.BooleanField(default=False)
 
     class Meta:
         ordering = ["-timestamp"]
