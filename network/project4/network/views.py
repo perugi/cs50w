@@ -87,7 +87,7 @@ def follow(request, profile_id):
         profile.followers.add(request.user.id)
 
     return HttpResponseRedirect(
-        reverse("view_profile", kwargs={"profile_id": profile_id})
+        reverse("view_profile", kwargs={"profile_id": profile_id, "page": 1})
     )
 
 
