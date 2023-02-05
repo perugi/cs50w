@@ -1,24 +1,19 @@
 import json
-from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import login_required
-from django.db import IntegrityError
-from django.http import (
-    HttpResponse,
-    HttpResponseRedirect,
-    HttpResponseBadRequest,
-    JsonResponse,
-)
-from django.shortcuts import render
-from django.urls import reverse
-from django.forms import ModelForm, Textarea
-from django.views.decorators.csrf import csrf_exempt
-from django.core.exceptions import ObjectDoesNotExist
 from datetime import datetime
 
-from .models import User, Post
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ObjectDoesNotExist
+from django.db import IntegrityError
+from django.forms import ModelForm, Textarea
+from django.http import (HttpResponse, HttpResponseBadRequest,
+                         HttpResponseRedirect, JsonResponse)
+from django.shortcuts import render
+from django.urls import reverse
+from django.views.decorators.csrf import csrf_exempt
 
 from .helpers import prepare_post_page
-
+from .models import Post, User
 
 # @login_required
 # def new_post(request):
